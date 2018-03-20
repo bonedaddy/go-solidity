@@ -1,0 +1,2 @@
+[{"constant":false,"inputs":[],"name":"emitEvent","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_a","type":"string"},{"indexed":false,"name":"_b","type":"string"}],"name":"TestEvent","type":"event"}]
+
