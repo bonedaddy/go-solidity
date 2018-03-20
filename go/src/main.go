@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 	"fmt"
+	"time"
 
 	//ethereum "github.com/ethereum/go-ethereum"
 	//"github.com/ethereum/go-ethereum/accounts/abi"
@@ -30,9 +31,36 @@ func main() {
 		log.Fatalf("error unlocking account")
 	}
 
-	address, tx, _, err := eth_events.DeployEthEvents(auth, client)
+	address, tx, event_emitter, err := eth_events.DeployEthEvents(auth, client)
 	if err != nil {
 		log.Fatalf("error deploying event test")
 	}
 	fmt.Printf("Contract Address: 0x%x\nTransaction Hash: 0x%x\n", address, tx.Hash())
+
+	fmt.Printf("sleeping for 1 minute")
+	time.Sleep(1 * time.Minute)
+
+	fmt.Printf("Emitting event")
+	tx, err = event_emitter.EmitEvent(auth)
+	if err != nil {
+		log.Fatalf("error")
+	}
+	fmt.Printf("Transaction hash: 0x%x\n", tx.Hash())
+
+	var ch = make(chan *eth_events.EthEventsTestEvent)
+
+	// returns an event subscription
+	sub, err := event_emitter.WatchTestEvent(nil, ch)
+	if err != nil {
+		log.Fatalf("error")
+	}
+
+    for {
+        select {
+        case err := <-sub.Err():
+            log.Fatal(err)
+        case log := <-ch:
+            fmt.Println("Log:", log)
+        }
+    }	
 }
