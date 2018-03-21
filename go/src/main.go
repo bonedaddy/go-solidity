@@ -8,7 +8,7 @@ import (
 	"time"
 
 	//ethereum "github.com/ethereum/go-ethereum"
-	//"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	//"github.com/ethereum/go-ethereum/common"
 	//"github.com/ethereum/go-ethereum/core/types"
@@ -47,6 +47,15 @@ func main() {
 	}
 	fmt.Printf("Transaction hash: 0x%x\n", tx.Hash())
 
+
+	fmt.Printf("Loading event ABI so we can parse event logs\n")
+    tokenAbi, err := abi.JSON(strings.NewReader(eth_events.EthEventsABI))
+    if err != nil {
+    	log.Fatalf("Error reading abi file")
+    }
+	fmt.Printf("ABI %s\n", tokenAbi)
+
+
 	var ch = make(chan *eth_events.EthEventsTestEvent)
 
 	// returns an event subscription
@@ -60,7 +69,10 @@ func main() {
         case err := <-sub.Err():
             log.Fatal(err)
         case log := <-ch:
-            fmt.Println("Log:", log)
+        	// the following prints the raw log data
+            // fmt.Println("Log:", log)
+            // the following prints log data for a
+            fmt.Printf("unpacked log data A %s\n", log.A)
         }
     }	
 }
