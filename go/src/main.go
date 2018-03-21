@@ -12,7 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	//"github.com/ethereum/go-ethereum/common"
 	//"github.com/ethereum/go-ethereum/core/types"
-	//"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"./eth_events"
 )
@@ -64,7 +64,11 @@ func main() {
 		log.Fatalf("error")
 	}
 
-    for {
+	go eventParser(sub, ch)
+	fmt.Println("event parser goroutine launched")
+	fmt.Println("Going to sleep for 1 minute")
+	time.Sleep(1 * time.Minute)
+    /*for {
         select {
         case err := <-sub.Err():
             log.Fatal(err)
@@ -74,5 +78,18 @@ func main() {
             // the following prints log data for a
             fmt.Printf("unpacked log data A %s\n", log.A)
         }
-    }	
+    }*/	
+}
+
+
+func eventParser(sub event.Subscription, c chan *eth_events.EthEventsTestEvent) {
+	
+	for {
+		select {
+		case err := <-sub.Err():
+			log.Fatal(err)
+		case log := <-c:
+			fmt.Printf("Unpacked log data A %s\nUnpacked log data B %s\n", log.A, log.B)
+		}
+	}
 }
